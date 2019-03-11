@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.2" halcon_version="18.05">
+<procedure name="main">
+<interface/>
+<body>
+<l>ScanningRuler_ReadBuffer (ImageCirX, ImageCirY, ImageCirZ, Intensity,768,512,'D:/Halcon/image/FreshBird/img_part1/img-3.dat')</l>
+<c></c>
+<c>*********************************************************************************</c>
+<c>******************方法二</c>
+<l>* read_sequence (Image, 0, 768, 512*3, 0, 0, 768, 512*3, 'real', 'MSBFirst', 'LSBFirst', 'long', 1,'C:/Users/maji1/Desktop/FreshBird/img_part1/img-0.dat')</l>
+<l>* threshold (Image, Region, -5000, 5000)</l>
+<l>* reduce_domain (Image, Region, ImageReduced)</l>
+<l>* mirror_image (ImageReduced, TmpImage, 'column')</l>
+<l>* get_image_pointer1 (TmpImage, Pointer, Type, Width, Height)</l>
+<l>* gen_image1 (ImageCirX1, 'real', Width, Height/3,Pointer)</l>
+<l>* crop_part(TmpImage, ImagePart, Height/3, 0, Width, Height*2/3)</l>
+<l>* get_image_pointer1 (ImagePart, Pointer1, Type1, Width1, Height1)</l>
+<l>* gen_image1 (ImageCirY1, 'real',  Width1, Height1/2, Pointer1)</l>
+<l>* crop_part (TmpImage, ImagePart1, Height*2/3, 0, Width, Height/3)</l>
+<l>* get_image_pointer1 (ImagePart1, Pointer2, Type2, Width2, Height2)</l>
+<l>* gen_image1 (ImageCirZ1, 'real', Width2, Height2, Pointer2)</l>
+<c>*Intensity</c>
+<l>* read_sequence (ImageIntensity1, 0, 768, 512*3*4+512, 512*3*4, 0, 768, 512, 'byte', 'MSBFirst', 'LSBFirst', 'byte', 1, 'C:/Users/maji1/Desktop/FreshBird/img_part1/img-0.dat')</l>
+<l>* threshold (ImageIntensity, Region, -5000, 5000)</l>
+<l>* reduce_domain (ImageIntensity, Region, ImageReduced)</l>
+<l>* mirror_image (ImageIntensity1, Intensity1, 'column')</l>
+<c>*********************************************************************************</c>
+<c>* Reduce domain to valid values</c>
+<l>threshold (ImageCirZ, Region, -2000.0, 2000.0)</l>
+<l>dev_open_window(0, 0, 512, 512, 'black', WindowHandle)</l>
+<c></c>
+<l>reduce_domain (ImageCirX, Region, ImageX)</l>
+<l>draw_region(region,WindowHandle )</l>
+<l>reduce_domain (ImageCirX, region, ImageX)</l>
+<l>reduce_domain (ImageCirY, Region, ImageY)</l>
+<l>reduce_domain (ImageCirZ, Region, ImageZ)</l>
+<l>reduce_domain (Intensity, Region, Intensity)</l>
+<c>* Set HALCON camera 3D coordinate system:</c>
+<c>* (Xh, Yh, Zh) = (-Xs/1000, Ys/1000, 2-(Zs/1000))</c>
+<l>scale_image (ImageX, ImageX, -0.001, 0)</l>
+<l>scale_image (ImageY, ImageY, 0.001, 0)</l>
+<l>scale_image (ImageZ, ImageZ, -0.001, 2)</l>
+<c>* Generate an ObjectModel3D and visualize it, press button to continue</c>
+<l>xyz_to_object_model_3d(ImageX, ImageY, ImageZ, ObjectModel3D)</l>
+<l>get_object_model_3d_params (ObjectModel3D, 'point_coord_z', z)</l>
+<l>select_points_object_model_3d(ObjectModel3D,'point_coord_z',1.045,1.0945,ObjectModel3DSelected)</l>
+<l>visualize_object_model_3d (WindowHandle, ObjectModel3DSelected, [], [], ['color','disp_normals'], ['blue','false'], [], [], [], PoseOut)</l>
+<l>create_surface_model (ObjectModel3DSelected, 0.01, [], [], SurfaceModelID)</l>
+<l>get_surface_model_param (SurfaceModelID, 'sampled_model', GenParamValue)</l>
+<l>* if (NumPoints &gt; 0)</l>
+<l>*         VisPose := []</l>
+<l>*         Instructions[0] := 'Rotate: Left button'</l>
+<l>*         Instructions[1] := 'Zoom:   Shift + left button'</l>
+<l>*         Instructions[2] := 'Move:   Ctrl  + left button'</l>
+<c>        </c>
+<l>*         dev_close_window()</l>
+<c>          </c>
+<l>*         visualize_object_model_3d (WindowHandle, ObjectModel3D, [], VisPose, ['intensity','lut'], ['coord_z','rainbow'], 'ObjectModel3D', [], Instructions, PoseOut)</l>
+<c>        * </c>
+<c>        * Visualize using the intensity data</c>
+<c>        </c>
+<l>*         get_region_points (ImageZ, Rows, Columns)</l>
+<l>*         get_grayval (Intensity, Rows, Columns, Grayval)</l>
+<l>*         set_object_model_3d_attrib_mod (ObjectModel3D, '&amp;intensity', 'points', Grayval)</l>
+<l>*         dev_clear_window ()</l>
+<l>*         visualize_object_model_3d (WindowHandle, ObjectModel3D, [], VisPose, ['intensity','lut'], ['&amp;intensity','sqrt'], 'ObjectModel3D with Intensity', [], Instructions, PoseOut)</l>
+<c>        * </c>
+<c>        * In order to create a surface triangulation from the</c>
+<c>        * ObjectModel3D, please see the following examples:</c>
+<c>        *   - triangulate_object_model_3d_implicit.hdev</c>
+<c>        *   - triangulate_object_model_3d_greedy.hdev</c>
+<c>        * </c>
+<l>* else</l>
+<l>*         disp_message (WindowHandle, 'No 3D points in the 3D object model!', 'window', 250, 200, 'black', 'true')</l>
+<l>*         stop ()</l>
+<l>* endif</l>
+<l>* clear_object_model_3d(ObjectModel3D)</l>
+<l>ScanningRuler_ReadBuffer (ImageCirX, ImageCirY, ImageCirZ, Intensity,768,512,'D:/Halcon/image/FreshBird/img_part1/img-4.dat')</l>
+<c></c>
+<c>*********************************************************************************</c>
+<c>* Reduce domain to valid values</c>
+<l>threshold (ImageCirZ, Region, -2000.0, 2000.0)</l>
+<l>reduce_domain (ImageCirX, Region, ImageX)</l>
+<l>reduce_domain (ImageCirY, Region, ImageY)</l>
+<l>reduce_domain (ImageCirZ, Region, ImageZ)</l>
+<l>reduce_domain (Intensity, Region, Intensity)</l>
+<c>* Set HALCON camera 3D coordinate system:</c>
+<c>* (Xh, Yh, Zh) = (-Xs/1000, Ys/1000, 2-(Zs/1000))</c>
+<l>scale_image (ImageX, ImageX, -0.001, 0)</l>
+<l>scale_image (ImageY, ImageY, 0.001, 0)</l>
+<l>scale_image (ImageZ, ImageZ, -0.001, 2)</l>
+<c>* Generate an ObjectModel3D and visualize it, press button to continue</c>
+<l>xyz_to_object_model_3d(ImageX, ImageY, ImageZ, ObjectModel3D)</l>
+<l>*get_object_model_3d_params (ObjectModel3D, 'num_points', NumPoints)</l>
+<l>*visualize_object_model_3d (WindowHandle, SurfaceModelID, [], [], ['color','disp_normals'], ['blue','false'], [], [], [], PoseOut)</l>
+<l>find_surface_model (SurfaceModelID, ObjectModel3D, 0.02, 0.2, 0, 'true', [], [], Pose, Score, SurfaceMatchingResultID)</l>
+<l>get_surface_matching_result (SurfaceMatchingResultID, 'sampled_scene', 0, ResultValue)</l>
+<l>*visualize_object_model_3d (WindowHandle, ResultValue, [], [], ['color','disp_normals'], ['blue','false'], [], [], [], PoseOut)</l>
+<c></c>
+<c></c>
+<l>rigid_trans_object_model_3d (GenParamValue, Pose, ObjectModel3DRigidTrans)</l>
+<l>visualize_object_model_3d (WindowHandle, [ObjectModel3DRigidTrans,ObjectModel3D], [], [], ['color_0','color_1'], ['green','blue'], [], [], [], PoseOut) </l>
+<c> </c>
+<c>    </c>
+</body>
+<docu id="main">
+<parameters/>
+</docu>
+</procedure>
+</hdevelop>

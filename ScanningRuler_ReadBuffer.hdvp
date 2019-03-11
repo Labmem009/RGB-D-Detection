@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hdevelop file_version="1.1" halcon_version="12.0.3">
+<procedure name="ScanningRuler_ReadBuffer">
+<interface>
+<oo>
+<par name="ImageCirX" base_type="iconic" dimension="0"/>
+<par name="ImageCirY" base_type="iconic" dimension="0"/>
+<par name="ImageCirZ" base_type="iconic" dimension="0"/>
+<par name="Intensity" base_type="iconic" dimension="0"/>
+</oo>
+<ic>
+<par name="Width" base_type="ctrl" dimension="0"/>
+<par name="Height" base_type="ctrl" dimension="0"/>
+<par name="File" base_type="ctrl" dimension="0"/>
+</ic>
+</interface>
+<body>
+<c>*Scanning Ruler Cir X, Cir Y, Cir Z ,Intensity</c>
+<c>*-&lt;subcomponent name="X" valuetype="FLOAT"&gt;</c>
+<c>*&lt;parameter name="size"&gt;3072&lt;/parameter&gt;</c>
+<c>*&lt;parameter name="width"&gt;768&lt;/parameter&gt;</c>
+<c>*&lt;/subcomponent&gt;</c>
+<c>*-&lt;subcomponent name="Y" valuetype="FLOAT"&gt;</c>
+<c>*&lt;parameter name="size"&gt;3072&lt;/parameter&gt;</c>
+<c>*&lt;parameter name="width"&gt;768&lt;/parameter&gt;</c>
+<c>*&lt;/subcomponent&gt;</c>
+<c>*-&lt;subcomponent name="Z" valuetype="FLOAT"&gt;</c>
+<c>*&lt;parameter name="size"&gt;3072&lt;/parameter&gt;</c>
+<c>*&lt;parameter name="width"&gt;768&lt;/parameter&gt;</c>
+<c>*&lt;/subcomponent&gt;</c>
+<c>*-&lt;subcomponent name="Intensity" valuetype="BYTE"&gt;</c>
+<c>*&lt;parameter name="size"&gt;768&lt;/parameter&gt;</c>
+<c>*&lt;parameter name="width"&gt;768&lt;/parameter&gt;</c>
+<c>*******************************************</c>
+<c>***</c>
+<c>*******************************************</c>
+<c>*Cir X</c>
+<l>read_sequence (ImageX, 0, Width, Height, 0, 0, Width, Height, 'real', 'MSBFirst', 'LSBFirst', 'long', 1, File)</l>
+<l>threshold (ImageX, RegionOut, -5000, 5000)</l>
+<l>reduce_domain (ImageX, RegionOut, ImageReduced)</l>
+<l>mirror_image (ImageReduced, ImageCirX, 'column')</l>
+<c>*Cir Y</c>
+<l>read_sequence (ImageY, 0, Width, Height*4, Height, 0, Width, Height, 'real', 'MSBFirst', 'LSBFirst', 'long', 1, File)</l>
+<l>threshold (ImageY, RegionOut, -5000, 5000)</l>
+<l>reduce_domain (ImageY, RegionOut, ImageReduced)</l>
+<l>mirror_image (ImageReduced, ImageCirY, 'column')</l>
+<c>*Cir Z</c>
+<l>read_sequence (ImageZ, 0, Width, Height*4, Height*2, 0, Width, Height, 'real', 'MSBFirst', 'LSBFirst', 'long', 1,File)</l>
+<l>threshold (ImageZ, RegionOut, -5000, 5000)</l>
+<l>reduce_domain (ImageZ, RegionOut, ImageReduced)</l>
+<l>mirror_image (ImageReduced, ImageCirZ, 'column')</l>
+<c>*Intensity</c>
+<l>read_sequence (ImageIntensity, 0, Width, Height*3*4+Height, Height*3*4, 0, Width, Height, 'byte', 'MSBFirst', 'LSBFirst', 'byte', 1, File)</l>
+<l>* threshold (ImageIntensity, Region, -5000, 5000)</l>
+<l>* reduce_domain (ImageIntensity, Region, ImageReduced)</l>
+<l>mirror_image (ImageIntensity, Intensity, 'column')</l>
+<l>return ()</l>
+</body>
+<docu id="ScanningRuler_ReadBuffer">
+<parameters>
+<parameter id="File">
+<default_type>string</default_type>
+<mixed_type>false</mixed_type>
+<sem_type>filename</sem_type>
+<type_list>
+<item>string</item>
+</type_list>
+</parameter>
+<parameter id="Height"/>
+<parameter id="ImageCirX">
+<sem_type>image</sem_type>
+</parameter>
+<parameter id="ImageCirY">
+<sem_type>image</sem_type>
+</parameter>
+<parameter id="ImageCirZ">
+<sem_type>image</sem_type>
+</parameter>
+<parameter id="Intensity">
+<sem_type>image</sem_type>
+</parameter>
+<parameter id="Width"/>
+</parameters>
+</docu>
+</procedure>
+</hdevelop>
